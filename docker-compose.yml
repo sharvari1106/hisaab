@@ -1,0 +1,33 @@
+# Local databases for development:  docker compose up -d
+services:
+  postgres:
+    image: pgvector/pgvector:pg16          # PostgreSQL 16 + pgvector (pg_trgm is built in)
+    container_name: hisaab-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-hisaab}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hisaab_dev_pw}
+      POSTGRES_DB: ${POSTGRES_DB:-hisaab}
+      TZ: Asia/Kolkata
+      PGTZ: Asia/Kolkata
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql:/sql:ro                     # lets you run: docker exec -it hisaab-postgres psql -U hisaab -f /sql/05_important_queries.sql
+      - ./tests:/tests:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hisaab}"]
+      interval: 5s
+      retries: 10
+
+  mongo:
+    image: mongo:7
+    container_name: hisaab-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+
+volumes:
+  pgdata:
+  mongodata:

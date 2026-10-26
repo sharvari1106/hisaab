@@ -1,0 +1,33 @@
+{
+  "name": "hisaab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Smart ledger, billing and inventory for kirana stores - PostgreSQL + pgvector + MongoDB + Next.js",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "db:up": "docker compose up -d",
+    "db:setup": "node --env-file=.env scripts/db-setup.mjs",
+    "db:seed": "node --env-file=.env scripts/seed.mjs",
+    "db:embed": "node --env-file=.env scripts/embed.mjs",
+    "db:test": "node --env-file=.env scripts/run-sql.mjs tests/db_tests.sql",
+    "db:queries": "node --env-file=.env scripts/run-sql.mjs sql/05_important_queries.sql",
+    "setup": "npm run db:setup && npm run db:seed && npm run db:embed"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.7.5",
+    "bcryptjs": "^3.0.2",
+    "jose": "^6.1.0",
+    "mongodb": "^6.20.0",
+    "next": "15.5.6",
+    "pg": "^8.16.3",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "tesseract.js": "^6.0.1"
+  },
+  "engines": {
+    "node": ">=20.6"
+  }
+}
