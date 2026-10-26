@@ -1,0 +1,13 @@
+flowchart TB
+    UI["<b>Browser</b> · Next.js React pages<br/>Billing · Inventory · Khata · Bill scan · Reports · Customer portal<br/>tesseract.js OCR runs on the device"]
+    MW["<b>middleware.js</b><br/>verify signed JWT cookie · role → allowed pages"]
+    API["<b>Next.js Route Handlers (/api/*)</b><br/>requireUser(role) · input validation · PostgreSQL error → friendly message"]
+    EMB["<b>transformers.js</b><br/>multilingual MiniLM<br/>text → 384-d vector"]
+    PG[("<b>PostgreSQL 16</b><br/>15 tables · keys · CHECK / UNIQUE<br/>fn_process_sale · sp_record_payment · triggers<br/>views · materialized view<br/>pgvector HNSW + pg_trgm + full-text GIN<br/>fn_hybrid_search (RRF)")]
+    MG[("<b>MongoDB</b><br/>activity_logs (TTL)<br/>product_attributes (wildcard index)<br/>bill_scans<br/>aggregation pipelines")]
+
+    UI -->|"fetch JSON (HTTPS, cookie)"| MW
+    MW --> API
+    API -->|"embed query"| EMB
+    API -->|"pg Pool · BEGIN / COMMIT · CALL"| PG
+    API -->|"insert logs · $group / $facet"| MG

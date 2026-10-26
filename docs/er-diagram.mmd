@@ -1,0 +1,144 @@
+erDiagram
+    SHOPS ||--o{ USERS : "employs / serves"
+    SHOPS ||--o{ CUSTOMERS : "keeps khata of"
+    SHOPS ||--o{ PRODUCTS : sells
+    SHOPS ||--o{ SUPPLIERS : "buys from"
+    SHOPS ||--o{ PURCHASES : records
+    SHOPS ||--o{ INVOICES : issues
+    SHOPS ||--o{ ALERTS : raises
+    USERS |o--o| SHOPS : "owns (owner_id)"
+    CUSTOMERS |o--o| USERS : "portal login"
+    CATEGORIES ||--o{ PRODUCTS : groups
+    PRODUCTS ||--o{ PRODUCT_ALIASES : "also called"
+    PRODUCTS ||--o{ BATCHES : "stocked as"
+    PRODUCTS ||--o{ ALERTS : "about"
+    SUPPLIERS ||--o{ PURCHASES : supplies
+    PURCHASES ||--o{ BATCHES : delivers
+    USERS ||--o{ INVOICES : bills
+    CUSTOMERS |o--o{ INVOICES : "buys on"
+    INVOICES ||--|{ INVOICE_ITEMS : contains
+    PRODUCTS ||--o{ INVOICE_ITEMS : "sold in"
+    BATCHES ||--o{ INVOICE_ITEMS : "picked from"
+    CUSTOMERS ||--o{ PAYMENTS : makes
+    USERS ||--o{ PAYMENTS : receives
+    CUSTOMERS ||--o{ LEDGER_ENTRIES : "has"
+    INVOICES |o--o| LEDGER_ENTRIES : "debit from"
+    PAYMENTS |o--o| LEDGER_ENTRIES : "credit from"
+    BATCHES ||--o{ STOCK_MOVEMENTS : "audited by"
+
+    SHOPS {
+        int shop_id PK
+        varchar name
+        varchar phone
+        varchar gstin UK
+        int owner_id FK
+    }
+    USERS {
+        int user_id PK
+        varchar phone UK
+        text password_hash
+        user_role role
+        int shop_id FK
+        int customer_id FK,UK
+        bool is_active
+    }
+    CUSTOMERS {
+        int customer_id PK
+        int shop_id FK
+        varchar name
+        varchar phone
+        numeric credit_limit
+        numeric current_balance
+    }
+    CATEGORIES {
+        int category_id PK
+        varchar name UK
+    }
+    PRODUCTS {
+        int product_id PK
+        int shop_id FK
+        int category_id FK
+        varchar name
+        varchar brand
+        varchar size_label
+        numeric mrp
+        numeric selling_price
+        int reorder_level
+        tsvector search_doc
+        vector_384 embedding
+    }
+    PRODUCT_ALIASES {
+        int alias_id PK
+        int product_id FK
+        varchar alias
+        varchar language
+    }
+    SUPPLIERS {
+        int supplier_id PK
+        int shop_id FK
+        varchar name
+    }
+    PURCHASES {
+        int purchase_id PK
+        int shop_id FK
+        int supplier_id FK
+        varchar supplier_invoice_no
+        date purchase_date
+        numeric total_amount
+    }
+    BATCHES {
+        int batch_id PK
+        int product_id FK
+        int purchase_id FK
+        date expiry_date
+        numeric cost_price
+        int qty_received
+        int qty_remaining
+    }
+    INVOICES {
+        int invoice_id PK
+        int shop_id FK
+        int customer_id FK
+        int staff_id FK
+        pay_mode payment_mode
+        numeric subtotal
+        numeric discount
+        numeric total
+    }
+    INVOICE_ITEMS {
+        int invoice_item_id PK
+        int invoice_id FK
+        int product_id FK
+        int batch_id FK
+        int qty
+        numeric unit_price
+        numeric unit_cost
+    }
+    PAYMENTS {
+        int payment_id PK
+        int customer_id FK
+        numeric amount
+        pay_mode mode
+        int received_by FK
+    }
+    LEDGER_ENTRIES {
+        bigint entry_id PK
+        int customer_id FK
+        ledger_kind kind
+        numeric amount
+        numeric balance_after
+        int invoice_id FK
+        int payment_id FK
+    }
+    STOCK_MOVEMENTS {
+        bigint movement_id PK
+        int batch_id FK
+        int change_qty
+        movement_reason reason
+    }
+    ALERTS {
+        int alert_id PK
+        int product_id FK
+        varchar kind
+        bool is_resolved
+    }
